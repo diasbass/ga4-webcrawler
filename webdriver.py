@@ -71,7 +71,7 @@ def crawl_site(start_url):
     return all_events
 
 # URL inicial
-start_url = 'https://geekproject.com.br'  # Substitua pela URL inicial
+start_url = 'https://google.com.br'  # Substitua pela URL inicial
 
 # Executa o crawler
 ga4_events = crawl_site(start_url)
