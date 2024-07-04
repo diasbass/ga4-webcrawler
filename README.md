@@ -43,7 +43,7 @@ Antes de rodar o script, você precisará ter o seguinte instalado:
    ```
 
 2. **Resultados**
-   O script navegará pelo site `https://geekproject.com.br`, capturando e exibindo os eventos GA4 encontrados nas solicitações de rede.
+   O script navegará pelo site definido no código, capturando e exibindo os eventos GA4 encontrados nas solicitações de rede.
 
 ## Estrutura do Projeto
 
