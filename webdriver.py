@@ -25,7 +25,7 @@ options.add_argument("--ignore-certificate-errors")
 driver = webdriver.Chrome(service=service, options=options)
 
 # URL para visitar
-url = 'https://estacio.br'
+url = 'https://google.com.br'
 print(f'Visiting: {url}')
 
 # Visita a URL
