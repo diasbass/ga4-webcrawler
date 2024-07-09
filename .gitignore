@@ -1,0 +1,24 @@
+# Exclui a pasta logs
+logs/
+
+# Exclui ambientes virtuais
+venv/
+env/
+
+# Exclui arquivos de cache do Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Exclui arquivos de configuração do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Exclui arquivos do editor de código
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Exclui arquivos de log
+*.log
