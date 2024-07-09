@@ -1,84 +1,60 @@
-from seleniumwire import webdriver  # Importa o Selenium Wire
+from seleniumwire import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 import time
-from bs4 import BeautifulSoup
 
-# Configurações do Selenium
+# Configuração do chromedriver
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Executa o Chrome em modo headless (sem interface gráfica)
-chrome_options.add_argument('--ignore-certificate-errors')  # Ignora erros de certificado SSL
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
-service = Service('C:/chromedriver/chromedriver.exe')  # Caminho absoluto para o ChromeDriver
+chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+chrome_options.add_argument("--headless")  # Opcional, executa o Chrome em modo headless
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
 
-# Inicializa o driver com Selenium Wire
+service = Service('C:/chromedriver/chromedriver.exe')  # Atualize com o caminho do seu chromedriver
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
-def navigate_and_collect_events(url):
-    try:
-        driver.get(url)
-        print(f"Página carregada: {url}")
-        
-        # Aguarda tempo suficiente para o carregamento dos eventos de GA4
-        time.sleep(15)
-        
-        # Identifica e coleta eventos de GA4 nas solicitações de rede
-        ga4_events = set()
-        for request in driver.requests:
-            if request.response:
-                if 'collect' in request.path and 'google-analytics.com' in request.host:
-                    ga4_events.add(request.path)
-                    print(f"Evento GA4 encontrado: {request.path}")
-        
-        return ga4_events
-    except Exception as e:
-        print(f"Erro ao navegar para {url}: {e}")
-        return set()
+# URL do site a ser visitado
+url = 'https://ibmec.br'
 
-def find_links_on_page(url):
-    try:
-        driver.get(url)
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        links = set()
-        for link in soup.find_all('a', href=True):
-            href = link['href']
-            if href.startswith('http') and url in href:
-                links.add(href)
-            elif href.startswith('/'):
-                links.add(url + href)
-        return links
-    except Exception as e:
-        print(f"Erro ao encontrar links na página {url}: {e}")
-        return set()
+# Função para esperar elementos específicos na página
+def wait_for_element(xpath, timeout=10):
+    for _ in range(timeout):
+        try:
+            if driver.find_element(By.XPATH, xpath):
+                return True
+        except:
+            time.sleep(1)
+    return False
 
-def crawl_site(start_url):
-    visited = set()
-    to_visit = {start_url}
-    all_events = set()
+# Visitando a página
+driver.get(url)
+print(f"Visiting: {url}")
 
-    while to_visit:
-        current_url = to_visit.pop()
-        if current_url not in visited:
-            print(f"Visiting: {current_url}")
-            visited.add(current_url)
-            events = navigate_and_collect_events(current_url)
-            all_events.update(events)
-            links = find_links_on_page(current_url)
-            to_visit.update(links)
-    
-    return all_events
+# Aguardando a página carregar completamente
+time.sleep(10)  # Ajuste o tempo conforme necessário para garantir a carga completa da página
 
-# URL inicial
-start_url = 'https://google.com.br'  # Substitua pela URL inicial
+# Simulação de navegação
+actions = ActionChains(driver)
+actions.send_keys(Keys.PAGE_DOWN).perform()
+time.sleep(2)
+actions.send_keys(Keys.PAGE_DOWN).perform()
+time.sleep(2)
+actions.send_keys(Keys.PAGE_UP).perform()
+time.sleep(2)
 
-# Executa o crawler
-ga4_events = crawl_site(start_url)
+# Verificando a captura de eventos do GA4
+requests = driver.requests
+ga4_events = [request for request in requests if 'https://analytics.google.com/g/collect' in request.url]
 
-print("GA4 Events found:")
-for event in ga4_events:
-    print(event)
+if ga4_events:
+    print("GA4 Events found:")
+    for event in ga4_events:
+        print(event.url)
+else:
+    print("No GA4 Events found")
 
-# Encerra o WebDriver
+# Fechando o navegador
 driver.quit()
