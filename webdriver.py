@@ -17,7 +17,7 @@ service = Service('C:/chromedriver/chromedriver.exe')  # Atualize com o caminho 
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # URL do site a ser visitado
-url = 'https://google.com'
+url = 'https://globo.com'
 
 # Função para esperar elementos específicos na página
 def wait_for_element(xpath, timeout=10):
